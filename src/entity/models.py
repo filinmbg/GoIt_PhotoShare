@@ -63,9 +63,10 @@ class Role(enum.Enum):
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
-    name = Column(String(50), nullable=False, unique=True)
+    username = Column(String(50), nullable=False, unique=True)
     email = Column(String(45), nullable=False, unique=True)
     password = Column(String(150), nullable=False)
+    avatar = Column(String(255), nullable=False)
     created_at = Column("created_at", DateTime, default=func.now())
     updated_at = Column("updated_at", DateTime, default=func.now(), onupdate=func.now())
     refresh_token = Column(String(255))
