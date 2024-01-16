@@ -15,10 +15,4 @@ class CommentsResponse(BaseModel):
     updated_at: datetime.datetime
 
     class Config:
-        orm_mode = True
-
-
-class UserResponse(BaseModel):
-    id: int
-    username: str
-    role: str
+        from_attributes = True
