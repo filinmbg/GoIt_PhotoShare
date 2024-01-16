@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
 # from src.routes import photo_routes
 # from src.routes import auth_routes
+from src.routes import comment_routes
 
 app = FastAPI()
 
@@ -24,6 +25,7 @@ origins = ["*"]
 
 # app.include_router(auth.router, prefix="/api")
 # app.include_router(photo.router, prefix="/api")
+app.include_router(comment_routes.router, prefix="/api")
 
 
 @app.get("/")
