@@ -6,31 +6,32 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database.db import get_db
 # from src.routes import photo_routes
-# from src.routes import auth_routes
-from src.routes import comment_routes
+
+from src.routes import auth_routes, comment_routes
+
 
 app = FastAPI()
 
 origins = ["*"]
-#
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
 
-# app.mount("/static", StaticFiles(directory='src/static'), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-# app.include_router(auth.router, prefix="/api")
+app.mount("/static", StaticFiles(directory='src/static'), name="static")
+
+app.include_router(auth_routes.router, prefix="/api")
 # app.include_router(photo.router, prefix="/api")
 app.include_router(comment_routes.router, prefix="/api")
 
 
 @app.get("/")
 def index():
-    return {"message": "Photo Application"}
+    return {"message": "PawPrints Application"}
 
 
 @app.get("/api/healthchecker")
