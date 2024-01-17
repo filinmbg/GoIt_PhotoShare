@@ -3,10 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.database.db import get_db
 # from src.routes import photo_routes
-
 from src.routes import auth_routes, comment_routes
 
 

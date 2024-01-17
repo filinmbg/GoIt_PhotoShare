@@ -82,3 +82,4 @@ class Auth:
 
 
 auth_service = Auth()
+get_current_user = auth_service.get_current_user
