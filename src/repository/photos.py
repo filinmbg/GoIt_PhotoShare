@@ -24,7 +24,6 @@ async def get_image(image_id: int, db: AsyncSession) -> Image:
 
     if image is None:
         raise ValueError("Image not found")
-
     return image
 
 

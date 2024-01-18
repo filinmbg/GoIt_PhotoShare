@@ -2,18 +2,20 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from GoIt_PhotoShare.src.database.db import get_db
 from GoIt_PhotoShare.src.entity.models import Image
+
 from GoIt_PhotoShare.src.schemas.photo_schemas import ImageResponse, ImageUpload
 import os
 
 router = APIRouter(prefix='/images', tags=['images'])
 
+
 @router.post("/", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
 async def upload_image(
-    image_data: ImageUpload,
-    file: UploadFile = File(),
-    db: AsyncSession = Depends(get_db),
-    uploads_dir: str = "uploads",
-    max_file_size: int = 1_000_000
+        image_data: ImageUpload,
+        file: UploadFile = File(),
+        db: AsyncSession = Depends(get_db),
+        uploads_dir: str = "uploads",
+        max_file_size: int = 1_000_000
 ) -> ImageResponse:
     file_path = await handle_uploaded_file(file, uploads_dir, max_file_size)
 
