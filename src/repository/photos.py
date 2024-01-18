@@ -1,47 +1,69 @@
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
-
-app = FastAPI()
-
-
-class Photo(BaseModel):
-    url: str
-    description: str
-    tags: Optional[List[str]] = []
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
+from sqlalchemy import select
+from src.entity.models import Image
+from datetime import datetime
+from typing import List
 
 
-photos_db = []
+async def create_image(db: AsyncSession, image_data: dict) -> Image:
+    try:
+        image = Image(**image_data)
+        db.add(image)
+        await db.commit()
+        await db.refresh(image)
+        return image
+    except Exception as e:
+        raise ValueError(f"Error creating image: {str(e)}")
 
 
-# завантаження світлини
-@app.post("/photos/")
-async def create_photo(photo: Photo):
-    photos_db.append(photo)
-    return {"message": "Photo uploaded successfully"}
+async def get_image(image_id: int, db: AsyncSession) -> Image:
+    stmt = select(Image).where(Image.id == image_id).options(selectinload(Image.tags))
+    result = await db.execute(stmt)
+    image = result.scalar()
+
+    if image is None:
+        raise ValueError("Image not found")
+
+    return image
 
 
-# Видалення світлини
-@app.delete("/photos/{photo_id}")
-async def delete_photo(photo_id: int):
-    if photo_id < 0 or photo_id >= len(photos_db):
-        raise HTTPException(status_code=404, detail="Photo not found")
-    del photos_db[photo_id]
-    return {"message": "Photo deleted successfully"}
+async def update_image(image_id: int, image_data: dict, db: AsyncSession) -> Image:
+    stmt = select(Image).where(Image.id == image_id)
+    result = await db.execute(stmt)
+    image = result.scalar()
+
+    if image is None:
+        raise ValueError("Image not found")
+
+    if image_data:
+        for field, value in image_data.items():
+            setattr(image, field, value)
+
+        await db.commit()
+        await db.refresh(image)
+
+    return image
 
 
-# редагування опису світлини
-@app.put("/photos/{photo_id}")
-async def update_photo(photo_id: int, updated_photo: Photo):
-    if photo_id < 0 or photo_id >= len(photos_db):
-        raise HTTPException(status_code=404, detail="Photo not found")
-    photos_db[photo_id] = updated_photo
-    return {"message": "Photo updated successfully"}
+async def delete_image(image_id: int, db: AsyncSession) -> Image:
+    stmt = select(Image).where(Image.id == image_id)
+    result = await db.execute(stmt)
+    image = result.scalar()
+
+    if image is None:
+        raise ValueError("Image not found")
+
+    try:
+        db.delete(image)
+        await db.commit()
+        return image
+    except Exception as e:
+        raise ValueError(f"Error deleting image: {str(e)}")
 
 
-# отримання світлни за урлом
-@app.get("/photos/{photo_id}")
-async def get_photo(photo_id: int):
-    if photo_id < 0 or photo_id >= len(photos_db):
-        raise HTTPException(status_code=404, detail="Photo not found")
-    return photos_db[photo_id]
+async def list_images(skip: int = 0, limit: int = 10, db: AsyncSession = None) -> List[Image]:
+    stmt = select(Image).offset(skip).limit(limit)
+    result = await db.execute(stmt)
+    images = result.scalars().all()
+    return images
