@@ -1,68 +1,42 @@
+from src.entity.models import User, Image
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select
-from src.entity.models import Image
-from datetime import datetime
-from typing import List
+from src.conf.config import config
+from cloudinary.uploader import upload
+from src.services.auth_service import get_current_user
+import cloudinary.uploader
+import cloudinary.api
+from fastapi import UploadFile, File, Form
+import uuid
 
 
-async def create_image(db: AsyncSession, image_data: dict) -> Image:
-    try:
-        image = Image(**image_data)
-        db.add(image)
-        await db.commit()
-        await db.refresh(image)
-        return image
-    except Exception as e:
-        raise ValueError(f"Error creating image: {str(e)}")
+class Cloudinary:
+    cloudinary.config(
+        cloud_name=config.CLOUDINARY_NAME,
+        api_key=config.CLOUDINARY_API_KEY,
+        api_secret=config.CLOUDINARY_API_SECRET,
+        secure=True,
+    )
 
 
-async def get_image(image_id: int, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id).options(selectinload(Image.tags))
-    result = await db.execute(stmt)
-    image = result.scalar()
+async def create_image(db: AsyncSession, file: UploadFile = File(), text: str = Form(...), user: User = None):
+    img_content = await file.read()
+    public_id = f"image_{user.id}_{uuid.uuid4()}"
 
-    if image is None:
-        raise ValueError("Image not found")
-    return image
+    # Завантаження на Cloudinary
+    response = cloudinary.uploader.upload(
+        img_content, public_id=public_id, overwrite=True, folder="publication"
+    )
 
+    # Зберігання в базі даних
+    image = Image(
+        user_id=user.id,
+        url=response["secure_url"],
+        description=text,
+        qr_url="",
+    )
 
-async def update_image(image_id: int, image_data: dict, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id)
-    result = await db.execute(stmt)
-    image = result.scalar()
-
-    if image is None:
-        raise ValueError("Image not found")
-
-    if image_data:
-        for field, value in image_data.items():
-            setattr(image, field, value)
-
-        await db.commit()
-        await db.refresh(image)
+    db.add(image)
+    await db.commit()
+    await db.refresh(image)
 
     return image
-
-
-async def delete_image(image_id: int, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id)
-    result = await db.execute(stmt)
-    image = result.scalar()
-
-    if image is None:
-        raise ValueError("Image not found")
-
-    try:
-        db.delete(image)
-        await db.commit()
-        return image
-    except Exception as e:
-        raise ValueError(f"Error deleting image: {str(e)}")
-
-
-async def list_images(skip: int = 0, limit: int = 10, db: AsyncSession = None) -> List[Image]:
-    stmt = select(Image).offset(skip).limit(limit)
-    result = await db.execute(stmt)
-    images = result.scalars().all()
-    return images
