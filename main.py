@@ -4,8 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
-# from src.routes import photo_routes
-from src.routes import auth_routes, comment_routes
+from src.routes import auth_routes, comment_routes, photo_routes
 
 
 app = FastAPI()
@@ -23,7 +22,7 @@ app.add_middleware(
 app.mount("/static", StaticFiles(directory='src/static'), name="static")
 
 app.include_router(auth_routes.router, prefix="/api")
-# app.include_router(photo.router, prefix="/api")
+app.include_router(photo_routes.router, prefix="/api")
 app.include_router(comment_routes.router, prefix="/api")
 
 

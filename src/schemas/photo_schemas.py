@@ -1,38 +1,26 @@
-from typing import List, Optional
-from pydantic import BaseModel, HttpUrl
-from fastapi import UploadFile, File
+from typing import Optional
+from pydantic import BaseModel
+from src.entity.models import Role
 
 
-class TagBase(BaseModel):
-    tag_name: str
+# class User(BaseModel):
+#     id: int
+#     username: str
+#     email: str
+#     role: Role = Role.user
+#     avatar: str
+#
+#     class ConfigDict:
+#         orm_mode = True
 
 
-class TagCreate(TagBase):
-    pass
-
-
-class TagResponse(TagBase):
+class PostSingle(BaseModel):
     id: int
+    user_id: int
+    url: str
+    description: Optional[str]
 
-
-class ImageBase(BaseModel):
-    description: str
-    tags: List[TagCreate] = []
-    public_id: str
-    user_id: int = 1
-
-
-class ImageUpload(ImageBase):
-    image_file: Optional[UploadFile]
-
-
-class ImageUpdate(ImageBase):
-    pass
-
-
-class ImageResponse(ImageBase):
-    id: int
-    tags: List[TagResponse] = []
-
-    class Config:
+    class ConfigDict:
         orm_mode = True
+
+
