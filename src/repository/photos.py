@@ -1,68 +1,75 @@
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlalchemy import select
-from src.entity.models import Image
-from datetime import datetime
-from typing import List
+from src.entity.models import User, Image
+from src.services.auth_service import get_current_user
+from cloudinary.uploader import upload
+from cloudinary.api import delete_resources_by_tag, resources
+from fastapi import UploadFile, File, Form
+import uuid
+
+router = APIRouter()
 
 
-async def create_image(db: AsyncSession, image_data: dict) -> Image:
-    try:
-        image = Image(**image_data)
-        db.add(image)
-        await db.commit()
-        await db.refresh(image)
-        return image
-    except Exception as e:
-        raise ValueError(f"Error creating image: {str(e)}")
+@router.post("/images", response_model=Image)
+async def create_image(db: AsyncSession = Depends(get_db), file: UploadFile = File(), text: str = Form(...), user: User = Depends(get_current_user)):
+    img_content = await file.read()
+    public_id = f"image_{user.id}_{uuid.uuid4()}"
 
+    # Завантаження на Cloudinary
+    response = upload(
+        img_content, public_id=public_id, overwrite=True, folder="publication"
+    )
 
-async def get_image(image_id: int, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id).options(selectinload(Image.tags))
-    result = await db.execute(stmt)
-    image = result.scalar()
+    # Зберігання в базі даних
+    image = Image(
+        user_id=user.id,
+        url=response["secure_url"],
+        description=text,
+        qr_url="",
+    )
 
-    if image is None:
-        raise ValueError("Image not found")
-    return image
-
-
-async def update_image(image_id: int, image_data: dict, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id)
-    result = await db.execute(stmt)
-    image = result.scalar()
-
-    if image is None:
-        raise ValueError("Image not found")
-
-    if image_data:
-        for field, value in image_data.items():
-            setattr(image, field, value)
-
-        await db.commit()
-        await db.refresh(image)
+    db.add(image)
+    await db.commit()
+    await db.refresh(image)
 
     return image
 
 
-async def delete_image(image_id: int, db: AsyncSession) -> Image:
-    stmt = select(Image).where(Image.id == image_id)
-    result = await db.execute(stmt)
-    image = result.scalar()
-
-    if image is None:
-        raise ValueError("Image not found")
-
-    try:
-        db.delete(image)
-        await db.commit()
-        return image
-    except Exception as e:
-        raise ValueError(f"Error deleting image: {str(e)}")
+@router.get("/images/{image_id}", response_model=Image)
+async def get_image(image_id: int, db: AsyncSession = Depends(get_db)):
+    image = await db.query(Image).filter(Image.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+    return image
 
 
-async def list_images(skip: int = 0, limit: int = 10, db: AsyncSession = None) -> List[Image]:
-    stmt = select(Image).offset(skip).limit(limit)
-    result = await db.execute(stmt)
-    images = result.scalars().all()
-    return images
+@router.put("/images/{image_id}", response_model=Image)
+async def update_image(image_id: int, text: str, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
+    image = await db.query(Image).filter(Image.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    image.description = text
+    await db.commit()
+    await db.refresh(image)
+    return image
+
+
+@router.delete("/images/{image_id}", response_model=dict)
+async def delete_image(image_id: int, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user)):
+    image = await db.query(Image).filter(Image.id == image_id).first()
+    if not image:
+        raise HTTPException(status_code=404, detail="Image not found")
+
+    if image.user_id != user.id:
+        raise HTTPException(status_code=403, detail="Permission denied")
+
+    delete_resources_by_tag(f"image_{user.id}_{image.id}")
+
+    db.delete(image)
+    await db.commit()
+
+    return {"message": "Image deleted successfully"}

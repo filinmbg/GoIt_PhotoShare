@@ -1,38 +1,21 @@
-from typing import List, Optional
-from pydantic import BaseModel, HttpUrl
-from fastapi import UploadFile, File
-
-
-class TagBase(BaseModel):
-    tag_name: str
-
-
-class TagCreate(TagBase):
-    pass
-
-
-class TagResponse(TagBase):
-    id: int
-
-
-class ImageBase(BaseModel):
+from pydantic import BaseModel
+class PostSingle(BaseModel):
+    url: str
     description: str
-    tags: List[TagCreate] = []
-    public_id: str
-    user_id: int = 1
+    qr_url: str
 
-
-class ImageUpload(ImageBase):
-    image_file: Optional[UploadFile]
-
-
-class ImageUpdate(ImageBase):
-    pass
-
-
-class ImageResponse(ImageBase):
+class GetSingle(BaseModel):
     id: int
-    tags: List[TagResponse] = []
+    user_id: int
+    url: str
+    description: str
+    qr_url: str
 
-    class Config:
-        orm_mode = True
+
+class PutSingle(BaseModel):
+    description: str
+
+
+class DeleteSingle(BaseModel):
+    message: str
+
