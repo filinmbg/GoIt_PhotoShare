@@ -1,17 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
-from src.entity.models import Role
-
-
-# class User(BaseModel):
-#     id: int
-#     username: str
-#     email: str
-#     role: Role = Role.user
-#     avatar: str
-#
-#     class ConfigDict:
-#         orm_mode = True
+import datetime
 
 
 class PostSingle(BaseModel):
@@ -24,3 +13,24 @@ class PostSingle(BaseModel):
         orm_mode = True
 
 
+class GetSingle(BaseModel):
+    id: int
+    user_id: int
+    url: str
+    description: str
+    qr_url: str
+
+    class ConfigDict:
+        orm_mode = True
+
+
+class PutSingle(BaseModel):
+    description: str
+    updated_at: datetime.datetime
+
+    class ConfigDict:
+        orm_mode = True
+
+
+class DeleteSingle(BaseModel):
+    message: str
