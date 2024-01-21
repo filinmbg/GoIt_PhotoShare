@@ -79,3 +79,4 @@ async def delete_images(
             return deleted_image
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+

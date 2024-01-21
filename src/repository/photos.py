@@ -38,7 +38,6 @@ async def create_image(db: AsyncSession, file: UploadFile = File(), text: str = 
 
     # Генерація QR-коду та збереження його в базі даних
     qr_code_content = generate_qr_code(response["secure_url"])
-    qr_public_id = f"qrcode_{user.id}_{uuid.uuid4()}"
     qr_response = cloudinary.uploader.upload(
         qr_code_content, overwrite=True, folder="qrcodes"
     )
@@ -100,6 +99,7 @@ async def delete_image(image_id: int, db: AsyncSession, user: User = None):
 
     return {"message": "Image deleted successfully"}
 
+
 async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
 
     image = db.query(Image).filter(Image.id == image_id).first()
@@ -125,3 +125,4 @@ async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
     db.refresh(image)
 
     return {"message": "Tag successfully added", "tag": tag.tag_name}
+
