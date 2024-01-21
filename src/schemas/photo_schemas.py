@@ -34,3 +34,4 @@ class PutSingle(BaseModel):
 
 class DeleteSingle(BaseModel):
     message: str
+
