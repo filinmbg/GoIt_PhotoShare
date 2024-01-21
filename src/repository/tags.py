@@ -1,7 +1,7 @@
 from fastapi import HTTPException
-
-from photos import app, photos_db
 from typing import List, Type
+from photos import app, photos_db
+
 
 from sqlalchemy.orm import Session
 
