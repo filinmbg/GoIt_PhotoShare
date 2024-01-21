@@ -35,7 +35,6 @@ async def create_image(db: AsyncSession, file: UploadFile = File(), text: str = 
 
     # Генерація QR-коду та збереження його в базі даних
     qr_code_content = generate_qr_code(response["secure_url"])
-    qr_public_id = f"qrcode_{user.id}_{uuid.uuid4()}"
     qr_response = cloudinary.uploader.upload(
         qr_code_content, overwrite=True, folder="qrcodes"
     )
@@ -96,3 +95,4 @@ async def delete_image(image_id: int, db: AsyncSession, user: User = None):
     await db.commit()
 
     return {"message": "Image deleted successfully"}
+
