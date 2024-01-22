@@ -1,3 +1,3 @@
-# GoIt_Project2
+# GoIt_Group_Project
 
-<h1 align="center">" REST API виконаний на FastAPI target="_blank">PawPrints</a> 
+<h1 align="center"> REST API виконаний на FastAPI <a target="_blank">PawPrints</a> 
