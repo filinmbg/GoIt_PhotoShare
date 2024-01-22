@@ -7,7 +7,7 @@ from src.database.db import get_db
 from src.entity.models import User, Tag
 from src.services.auth_service import auth_service
 from src.repository import tags as repo_tags
-from src.schemas.tag_schemas import TagModel, TagResponse, PhotoResponse, PhotoAddTagsModel
+from src.schemas.tag_schemas import TagModel, TagResponse, PhotoAddTagsModel, TagResponseNew
 from src.conf import messages
 from src.routes.photo_routes import allowed_operation_admin
 from src.services.validator import validate_tags_count
@@ -16,24 +16,7 @@ from src.services.validator import validate_tags_count
 router = APIRouter(tags=["Tags"])
 
 
-# @router.post(
-#     "/",
-#     response_model=List[TagResponse],
-#     dependencies=[Depends(allowed_operation_admin)],
-# )
-# async def get_tags(db: AsyncSession = Depends(get_db)):
-#
-#
-#     tags = await repository_tags.get_tags(db)
-#     return tags
-# @router.post('/{photo_id}')#, response_model=PhotoResponse)
-# async def add_tag_to_photo(photo_id: int,
-#                            body: PhotoAddTagsModel,
-#                            current_user: User = Depends(auth_service.get_current_user),
-#                            db: AsyncSession = Depends(get_db)):
-#     tags_list = await validate_tags_count(body.tags)
-#     return await repository_tags.add_tag_to_photo_(tags_list, photo_id, db)
-@router.post('/{photo_id}', status_code=status.HTTP_201_CREATED)
+@router.post('/{photo_id}', response_model=TagResponseNew)
 async def add_tag_to_photo(photo_id: int, body: PhotoAddTagsModel, db: AsyncSession = Depends(get_db)):
     tags_list = await validate_tags_count(body.tags)
     return await repository_tags.add_tag_to_photo_(tags_list, photo_id, db)
@@ -44,7 +27,7 @@ async def get_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
 
     tag = await repository_tags.get_tag_by_id(tag_id, db)
     if tag is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.get_message("Tag not found"))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Tag not found")
     return tag
 
 

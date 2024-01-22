@@ -35,7 +35,6 @@ async def add_tags_to_photo(tags: List[str], photo_id: int, session: AsyncSessio
     return result
 
 
-
 async def get_tags_photo(photo_id: int, db: AsyncSession):
     tquery = select(Tag).join(image_m2m_tag).where(Tag.id == image_m2m_tag.c.tag_id).where(
         image_m2m_tag.c.image_id == photo_id)

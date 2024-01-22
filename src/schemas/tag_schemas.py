@@ -42,3 +42,7 @@ class PhotoResponse(BaseModel):
 
 class PhotoAddTagsModel(BaseModel):
     tags: Optional[List[str]]
+
+
+class TagResponseNew(BaseModel):
+    detail: str = "Tags has been added to the photo"
