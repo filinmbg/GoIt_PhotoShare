@@ -1,7 +1,7 @@
 # GoIt_Group_Project
 
 <h1 align="center">PawPrints</h1> 
-![Image alt](https://github.com/filinmbg/PawPrints/blob/main/image/pawprints.png)
+![ScreenShot](https://github.com/filinmbg/PawPrints/blob/main/image/pawprints.png)
 <h2>Опис проєкту</h2>
 <a>PawPrints - це REST API для обміну та управління фотографіями. Застосунок, реалізований на FastAPI, дозволяє користувачам завантажувати фотографії, коментувати їх, додавати теги та дійснювати пошук світлин за ключовим словом або тегом.</a> 
 
