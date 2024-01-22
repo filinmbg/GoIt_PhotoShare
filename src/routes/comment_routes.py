@@ -6,7 +6,7 @@ from src.database.db import get_db
 from src.entity.models import User
 from src.services.auth_service import get_current_user
 
-router = APIRouter(prefix="/comments", tags=['comments'])
+router = APIRouter(prefix="/comments", tags=['Comments'])
 
 
 # Роут для створення коментарів
