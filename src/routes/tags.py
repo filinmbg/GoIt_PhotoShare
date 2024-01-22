@@ -7,23 +7,36 @@ from src.database.db import get_db
 from src.entity.models import User, Tag
 from src.services.auth_service import auth_service
 from src.repository import tags as repo_tags
-from src.schemas.tag_schemas import TagModel, TagResponse
+from src.schemas.tag_schemas import TagModel, TagResponse, PhotoResponse, PhotoAddTagsModel
 from src.conf import messages
 from src.routes.photo_routes import allowed_operation_admin
-
-router = APIRouter(tags=["tags"])
-
-
-@router.get(
-    "/",
-    response_model=List[TagResponse],
-    dependencies=[Depends(allowed_operation_admin)],
-)
-async def get_tags(db: AsyncSession = Depends(get_db)):
+from src.services.validator import validate_tags_count
 
 
-    tags = await repository_tags.get_tags(db)
-    return tags
+router = APIRouter(tags=["Tags"])
+
+
+# @router.post(
+#     "/",
+#     response_model=List[TagResponse],
+#     dependencies=[Depends(allowed_operation_admin)],
+# )
+# async def get_tags(db: AsyncSession = Depends(get_db)):
+#
+#
+#     tags = await repository_tags.get_tags(db)
+#     return tags
+# @router.post('/{photo_id}')#, response_model=PhotoResponse)
+# async def add_tag_to_photo(photo_id: int,
+#                            body: PhotoAddTagsModel,
+#                            current_user: User = Depends(auth_service.get_current_user),
+#                            db: AsyncSession = Depends(get_db)):
+#     tags_list = await validate_tags_count(body.tags)
+#     return await repository_tags.add_tag_to_photo_(tags_list, photo_id, db)
+@router.post('/{photo_id}', status_code=status.HTTP_201_CREATED)
+async def add_tag_to_photo(photo_id: int, body: PhotoAddTagsModel, db: AsyncSession = Depends(get_db)):
+    tags_list = await validate_tags_count(body.tags)
+    return await repository_tags.add_tag_to_photo_(tags_list, photo_id, db)
 
 
 @router.get("/{tag_id}", dependencies=[Depends(allowed_operation_admin)], response_model=TagResponse)
@@ -35,19 +48,18 @@ async def get_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
     return tag
 
 
-@router.patch("/{tag_id}", dependencies=[Depends(allowed_operation_admin)], response_model=TagResponse)
+@router.put("/{tag_id}", dependencies=[Depends(allowed_operation_admin)], response_model=TagResponse)
 async def update_tag(tag_id: int, body: TagModel, db: AsyncSession = Depends(get_db)):
 
     tag = await repository_tags.get_tag_by_id(tag_id, db)
-    exist_tag = await repository_tags.get_tag_by_name(str(body.tagname), db)
-
+    exist_tag = await repository_tags.get_tag_by_name(str(body.tag_name), db)
     if tag:
-        if exist_tag is None:
+        if exist_tag:
             updated_tag = await repository_tags.update_tag(tag_id, body, db)
             return updated_tag
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=messages.get_message("TAGNAME_ALREADY_EXIST"))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="TAGNAME_ALREADY_EXIST")
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.get_message("TAGNAME_NOT_FOUND"))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="TAGNAME_NOT_FOUND")
 
 
 @router.delete("/{tag_id}", dependencies=[Depends(allowed_operation_admin)], status_code=status.HTTP_204_NO_CONTENT)
@@ -55,7 +67,7 @@ async def delete_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
 
     tag = await repository_tags.get_tag_by_id(tag_id, db)
     if tag is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=messages.get_message("TAGNAME_NOT_FOUND"))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="TAGNAME_NOT_FOUND")
 
-    result = await repository_tags.remove_tag(tag_id, db)
+    result = await repository_tags.remove_tag_by_id(tag_id, db)
     return result
