@@ -47,27 +47,35 @@
 </ul>
 
 <h2>Технології</h2>
-<p>Фреймворк: FastAPI.</p>
-<p>База даних: PostgreSQL з використанням SQLAlchemy ORM.</p>
-<p>Аутентифікація: JWT токени.</p>
-<p>Зберігання фотографій: Cloudinary.</p>
-<p>Генерація QR-code: бібліотека qrcode.</p>
-<p>Документація: Swagger. Повна документація API доступна за посиланням /docs після запуску застосунку.</p>
+
+<ul>
+  <li>Фреймворк: FastAPI</li>
+  <li>База даних: PostgreSQL з використанням SQLAlchemy ORM</li>
+  <li>Аутентифікація: JWT токени</li>
+  <li>Зберігання фотографій: Cloudinary</li>
+  <li>Генерація QR-code: бібліотека qrcode</li>
+  <li>Документація: Swagger. Повна документація API доступна за посиланням /docs після запуску застосунку</li>
 
 <p>Застосунок покритий модульними тестами.</p>
 <p>Деплой застосунку виконано за допомогою Koyeb.</p>
+</ul>
 
 <h2>Інструкція з встановлення та використання</h2>
-<p>Клонувати репозиторій: git clone https://github.com/filinmbg/PawPrints.git</p>
-<p>Зайти в папку проекту: cd pawprints</p>
-<p>Встановити залежності: poetry install</p>
-<p>Перейти у выртуальне середовище: poetry shell</p>
-<p>Запустити застосунок: uvicorn main:app --reload</p>
+
+<ul>
+  <li>Клонувати репозиторій: git clone https://github.com/filinmbg/PawPrints.git</li>
+  <li>Зайти в папку проекту: cd pawprints</li>
+  <li>Встановити залежності: poetry install</li>
+  <li>Перейти у выртуальне середовище: poetry shell</li>
+  <li>Запустити застосунок: uvicorn main:app --reload</li>
+</ul>
 
 <h2>Розробники</h2
-<p>Team Lead: Олександр Юха</p>
-<p>Scrum master: Святослав Артеменко</p>
-<p>Python Developer: Олександр Куспис</p>
-<p>Python Developer: Михайло Питомець</p>
-
+                
+<ul>
+  <li>Team Lead: Олександр Юха</li>
+  <li>Scrum master: Святослав Артеменко</li>
+  <li>Python Developer: Олександр Куспис</li>>
+  <li>Python Developer: Михайло Питомець</li>
+</ul>
 
