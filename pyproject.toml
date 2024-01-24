@@ -1,0 +1,51 @@
+[tool.poetry]
+name = "goit-photoshare"
+version = "0.1.0"
+description = ""
+authors = ["filinmbg <filinmbg@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+uvicorn = {extras = ["standard"], version = "^0.26.0"}
+sqlalchemy = "^2.0.25"
+psycopg2 = "^2.9.9"
+alembic = "^1.13.1"
+pydantic = {extras = ["email"], version = "^2.5.3"}
+pydantic-settings = "^2.1.0"
+asyncpg = "^0.29.0"
+fastapi = "^0.109.0"
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+libgravatar = "^1.0.4"
+python-multipart = "^0.0.6"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+cloudinary = "^1.38.0"
+qrcode = "^7.4.2"
+aiohttp = "^3.9.1"
+jinja2 = "^3.1.2"
+
+
+[tool.poetry.group.dev.dependencies]
+sphinx = "^7.2.6"
+
+
+
+[tool.poetry.group.test.dependencies]
+pytest-asyncio = "^0.23.3"
+pytest = "^7.4.4"
+httpx = "^0.26.0"
+aiosqlite = "^0.19.0"
+aioresponses = "^0.7.6"
+pytest-cov = "^4.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules"
+testpaths = [
+    "tests", ]
+pythonpath = "."
+filterwarnings = "ignore::DeprecationWarning"
+
