@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PawPrints - Photo Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .photo {
+            margin-bottom: 20px;
+        }
+
+        .photo img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>PawPrints - Photo Gallery</h1>
+</header>
+
+<main>
+    <div class="photo">
+        <img src="path_to_photo.jpg" alt="Photo Description">
+        <p>Tags: #tag1 #tag2</p>
+        <p>Comments:</p>
+        <ul>
+            <li>Comment 1</li>
+            <li>Comment 2</li>
+        </ul>
+    </div>
+
+    <!-- Add more photo divs as needed -->
+
+</main>
+
+<footer>
+    <p>&copy; 2024 PawPrints</p>
+</footer>
+
+</body>
+</html>
