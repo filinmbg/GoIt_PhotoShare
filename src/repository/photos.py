@@ -1,15 +1,9 @@
 from sqlalchemy import select
-from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
-from src.entity.models import User, Image, Tag
+from src.entity.models import User, Image
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.conf.config import config
-from src.conf import messages
-from src.schemas.tag_schemas import TagModel
 from cloudinary.uploader import upload
 from src.repository.qrcode_generator import generate_qr_code
-from src.repository.tags import create_tag
-from src.services.auth_service import get_current_user
 import cloudinary.uploader
 from cloudinary.uploader import destroy
 import cloudinary.api
@@ -60,28 +54,29 @@ async def create_image(db: AsyncSession, file: UploadFile = File(), text: str = 
 
 # отримувати світлину за унікальним посиланням в БД
 async def get_image(image_id: int, session: AsyncSession):
+
     image = await session.execute(select(Image).filter(Image.id == image_id))
-    image = image.scalar()
+    image = image.scalar_one_or_none()
     if not image:
-        raise HTTPException(status_code=404, detail="Image not found")
+
+      raise HTTPException(status_code=404, detail="Image not found")
     return image
 
 
-async def update_image(image_id: int, new_description: str, db: Session):
+async def update_image(image_id: int, new_description: str, db: AsyncSession):
+
     image = await db.execute(select(Image).filter(Image.id == image_id))
     image = image.scalar()
-
     if not image:
         raise HTTPException(status_code=404, detail="Image not found")
-
     image.description = new_description
     await db.commit()
     await db.refresh(image)
-
     return image
 
 
 async def delete_image(image_id: int, db: AsyncSession, user: User = None):
+
     image = await db.execute(select(Image).filter(Image.id == image_id))
     image = image.scalar()
     if not image:
@@ -98,31 +93,3 @@ async def delete_image(image_id: int, db: AsyncSession, user: User = None):
     await db.commit()
 
     return {"message": "Image deleted successfully"}
-
-
-async def add_tag(db: Session, user: User, image_id: int, tag_name: str):
-
-    image = db.query(Image).filter(Image.id == image_id).first()
-    if image is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail=messages.IMAGE_NOT_FOUND
-        )
-    if image.user_id != user.id:
-        raise HTTPException(status_code=403, detail=messages.NOT_ALLOWED)
-    if len(image.tags) >= 5:
-        raise HTTPException(
-            status_code=status.HTTP_406_NOT_ACCEPTABLE, detail=messages.ONLY_FIVE_TAGS
-        )
-    tag = db.query(Tag).filter(Tag.tag_name == tag_name.lower()).first()
-
-    if tag is None:
-        tag_model = TagModel(tag_name=tag_name)
-        tag = await create_tag(tag_model, db)
-
-    image.tags.append(tag)
-
-    db.commit()
-    db.refresh(image)
-
-    return {"message": "Tag successfully added", "tag": tag.tag_name}
-
