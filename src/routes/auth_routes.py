@@ -7,7 +7,7 @@ from src.repository import users as repositories_users
 from src.schemas.user_schemas import UserSchema, TokenSchema, UserResponse
 from src.services.auth_service import auth_service
 
-router = APIRouter(prefix='/auth', tags=['auth'])
+router = APIRouter(prefix='/auth', tags=['Auth'])
 get_refresh_token = HTTPBearer()
 
 

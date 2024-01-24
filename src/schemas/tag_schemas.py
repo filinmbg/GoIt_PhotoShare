@@ -45,4 +45,6 @@ class PhotoAddTagsModel(BaseModel):
 
 
 class TagResponseNew(BaseModel):
+
     detail: str = "Tags has been added to the photo"
+

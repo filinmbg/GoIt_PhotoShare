@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, Request
-from fastapi.responses import HTMLResponse
+
+from fastapi.responses import HTMLResponse, JSONResponse
+
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
@@ -8,7 +10,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.database.db import get_db
 from src.routes import auth_routes, comment_routes, photo_routes, cloudinary_routes, tags
 import time
+
 import pathlib
+
 
 app = FastAPI()
 
@@ -30,9 +34,12 @@ async def custom_middleware(request: Request, call_next):
     return response
 
 
+
 BASE_DIR = pathlib.Path(__file__).parent
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 templates = Jinja2Templates(directory='templates')
+
+
 
 
 @app.get("/", response_class=HTMLResponse, description="Paw Prints", tags=["Main index.html"])
@@ -59,3 +66,4 @@ app.include_router(photo_routes.router, prefix="/api")
 app.include_router(comment_routes.router, prefix="/api")
 app.include_router(tags.router, prefix="/api")
 app.include_router(cloudinary_routes.router, prefix='/api')
+

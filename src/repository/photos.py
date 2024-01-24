@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.conf.config import config
 from cloudinary.uploader import upload
 from src.repository.qrcode_generator import generate_qr_code
+
 import cloudinary.uploader
 from cloudinary.uploader import destroy
 import cloudinary.api
@@ -93,3 +94,4 @@ async def delete_image(image_id: int, db: AsyncSession, user: User = None):
     await db.commit()
 
     return {"message": "Image deleted successfully"}
+

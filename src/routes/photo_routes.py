@@ -8,7 +8,7 @@ from src.repository.photos import create_image, get_image, update_image, delete_
 from src.entity.models import User, Role
 from src.services.role_service import RoleAccess
 
-router = APIRouter(prefix='/photos', tags=['photos'])
+router = APIRouter(prefix='/photos', tags=['Photos'])
 
 allowed_operation_admin = RoleAccess([Role.admin])
 allowed_operation_create = RoleAccess([Role.admin, Role.moderator, Role.user])

@@ -10,7 +10,7 @@ from src.database.db import get_db
 from src.entity.models import Image
 from src.services.cloudinary_service import cloudinary
 
-router = APIRouter(prefix='/transformed_image', tags=["transformed_image"])
+router = APIRouter(prefix='/transformed_image', tags=["Cloudinary"])
 
 
 @router.get("/{image_id}")

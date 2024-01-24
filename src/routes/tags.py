@@ -2,12 +2,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException, status
 from src.repository import tags as repository_tags
 from src.database.db import get_db
+
 from src.schemas.tag_schemas import TagModel, TagResponse, PhotoAddTagsModel, TagResponseNew
 from src.routes.photo_routes import allowed_operation_admin
 from src.services.validator import validate_tags_count
 
 router = APIRouter(tags=["Tags"])
 
+
+router = APIRouter(tags=["Tags"])
 
 @router.post('/{photo_id}', response_model=TagResponseNew)
 async def add_tag_to_photo(photo_id: int, body: PhotoAddTagsModel, db: AsyncSession = Depends(get_db)):
@@ -23,6 +26,7 @@ async def add_tag_to_photo(photo_id: int, body: PhotoAddTagsModel, db: AsyncSess
     :return: A list of tags that were added to the photo
     :doc-author: Trelent
     """
+
     tags_list = await validate_tags_count(body.tags)
     return await repository_tags.add_tag_to_photo_(tags_list, photo_id, db)
 
@@ -84,4 +88,6 @@ async def delete_tag(tag_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="TAGNAME_NOT_FOUND")
 
     result = await repository_tags.remove_tag_by_id(tag_id, db)
+
     return result
+

@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from typing import List
 from sqlalchemy import select, insert
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.services.validator import validate_tags_count
 from src.routes.photo_routes import get_image
 from src.entity.models import Tag, image_m2m_tag
@@ -39,11 +40,13 @@ async def add_tags_to_photo(tags: List[str], photo_id: int, session: AsyncSessio
 
         result.append(tag_obj)
 
+
     await session.commit()
     return result
 
 
 async def get_tags_photo(photo_id: int, db: AsyncSession):
+
     """
     The get_tags_photo function takes a photo_id and an async database session as arguments.
     It then creates a query that selects all tags associated with the given photo_id,
@@ -54,6 +57,7 @@ async def get_tags_photo(photo_id: int, db: AsyncSession):
     :return: A list of tags or false if there are no tags for the photo
     :doc-author: Trelent
     """
+
     tquery = select(Tag).join(image_m2m_tag).where(Tag.id == image_m2m_tag.c.tag_id).where(
         image_m2m_tag.c.image_id == photo_id)
     result = await db.execute(tquery)
@@ -62,6 +66,7 @@ async def get_tags_photo(photo_id: int, db: AsyncSession):
         return tags
     else:
         return False
+
 
 
 async def add_tag_to_photo_(tags: List[str], photo_id: int, db: AsyncSession):
@@ -94,6 +99,16 @@ async def get_tags(db: AsyncSession):
     """
     tags = db.query(Tag).all()
     return tags
+
+
+async def add_tag_to_photo_(tags: List[str], photo_id: int, db: AsyncSession):
+    tags_photo = await get_tags_photo(photo_id, db)
+    if not tags_photo:
+        await validate_tags_count(tags=tags)
+        await add_tags_to_photo(tags, photo_id, db)
+        photo = await get_image(photo_id, db)
+        await db.commit()
+        return photo
 
 
 async def get_tag_by_id(tag_id: int, db: AsyncSession) -> Tag | None:
@@ -153,6 +168,7 @@ async def update_tag(tag_id: int, body: TagModel, db: AsyncSession) -> Tag | Non
 
 
 async def remove_tag_by_id(tag_id: int, db: AsyncSession) -> Tag | None:
+
     """
     The remove_tag_by_id function removes a tag from the database by its id.
         Args:
@@ -164,6 +180,7 @@ async def remove_tag_by_id(tag_id: int, db: AsyncSession) -> Tag | None:
     :return: A dictionary with a message
     :doc-author: Trelent
     """
+
     tag = await get_tag_by_id(tag_id, db)
     if tag:
         await db.delete(tag)
@@ -172,6 +189,7 @@ async def remove_tag_by_id(tag_id: int, db: AsyncSession) -> Tag | None:
 
 
 async def remove_tag_by_name(tag_name: str, db: AsyncSession) -> Tag | None:
+
     """
     remove_tag_by_name function removes a tag from the database by name.
     Args:
@@ -182,6 +200,7 @@ async def remove_tag_by_name(tag_name: str, db: AsyncSession) -> Tag | None:
     :param db: AsyncSession: Pass in the database session
     :return: A dictionary with a message
     """
+
     tag = await get_tag_by_name(tag_name, db)
     if tag:
         await db.delete(tag)
