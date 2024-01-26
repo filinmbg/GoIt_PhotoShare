@@ -72,7 +72,7 @@
 <h2>Розробники</h2
 <ul>
   <li>Team Lead: Олександр Юха</li>
-  <li>Scrum master: Святослав Артеменко</li>
+  <li>Scrum master: Вячеслав Артеменко</li>
   <li>Python Developer: Олександр Куспис</li>
   <li>Python Developer: Михайло Питомець</li>
 </ul>
